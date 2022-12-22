@@ -3,7 +3,7 @@ pipeline
     agent { label 'master' }
     tools
     {
-        maven 'dev'
+        maven 'MAVEN'
     } 
     environment
     {
