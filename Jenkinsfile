@@ -1,13 +1,8 @@
-pipeline
-{
+pipeline{
     agent any
     tools
     {
         maven 'MAVEN'
-    } 
-    environment
-    {
-      TOMCAT_PATH = "/usr/share/tomcat/webapps"
     }
     stages
     {
@@ -15,104 +10,62 @@ pipeline
         {
             steps
             {
-                script
-                {
-                  try
-                  {
-                     git 'https://github.com/keshavr21/maven_test.git'
-                  }
-                  catch(Exception e1)
-                  {
-                     mail bcc: '', body: 'DOWNLOADING CODE IS FAILED', cc: '', from: '', replyTo: '', subject: '', to: 'github@xyz.com'
-                     exit(1)
-                  }
-                }
+                git 'https://github.com/hemanaik21/maven_test.git'
             }
         }
-        stage('continuos integration')
+        stage('continuous build')
         {
             steps
             {
-               script
-               {
-                 try
-                 {
-                     sh 'mvn clean package'
-                 }
-                 catch(Exception e2)
-                 {
-                     mail bcc: '', body: 'BUILDING CODE IS FAILED', cc: '', from: '', replyTo: '', subject: '', to: 'dev@xyz.com'
-                     exit(1)
-                 }
-               }
+                sh 'mvn clean package'
+            }
+        }
+         stage('continuous deploy')
+        {
+            steps
+            {
                 
-            }
+            deploy adapters: [tomcat9(credentialsId: 'Tomcat', path: '', url: 'http://172.31.33.156:8080/')], contextPath: 'decapp', war: '**/*war'
         }
-        stage('continuous deployment')
+        }
+          stage('continuous test')
         {
             steps
             {
-               script 
-               {
-                 try 
-                 {
-                     deploy adapters: [tomcat9(credentialsId: 'tomcat', path: '', url: 'http://172.31.40.147:8080/')], contextPath: 'testapp', war: '**/*.war'
-                 }
-                 catch(Exception e3)
-                 {
-                     mail bcc: '', body: 'BUILDING CODE IS FAILED', cc: '', from: '', replyTo: '', subject: '', to: 'devops@xyz.com'
-                     exit(1)
-                 }
-               }
                 
-            }
+            git 'https://github.com/hemanaik21/maven_test.git'
+        
+            sh 'java -jar ${WORKSPACE}/testing.jar'
         }
-        stage('continuous testing')
-        {
-            steps
-            {
-               script
-               {
-                 try 
-                 {
-                   git 'https://github.com/keshavr21/test_cases.git'
-                   sh 'java -jar $WORKSPACE/testing.jar'
-                 }
-                 catch(Exception e4)
-                 {
-                   mail bcc: '', body: 'BUILDING CODE IS FAILED', cc: '', from: '', replyTo: '', subject: '', to: 'testing@xyz.com'
-                   exit(1)
-                 }
-               }
-            }
         }
-        stage('continuous delivery')
-        {
-            steps
-            {
-                deploy adapters: [tomcat9(credentialsId: 'tomcat', path: '', url: 'http://172.31.40.147:8080/')], contextPath: 'prod', war: '**/*.war'
-            }
-        }
-
+    
+        //stage('continuous delivery')
+        //{
+           // steps
+            //{
+                //input message: 'Waiting for manager approval', submitter: 'naik,admin'
+                
+              //sh 'scp ${WORKSPACE}/webapp/target/*.war ec2-user@172.31.33.156:/home/ec2-user/usr/shared/apache-tomcat-9.0.70/webapps/prodapp.war' 
+              
+        //}
+        //}
     }
-    post
-    {
-        success
+        post
         {
-            sh 'echo "THIS STEP WILL RUN when job is success"'
-        }
-        failure
-        {
-            mail bcc: '', body: 'CI PIPELINE IS FAILED', cc: '', from: '', replyTo: '', subject: '', to: 'team@xyz.com'
-        }
-        always
-        {
-            sh 'echo "THIS STEP WILL ALWAYS RUN"'
-        }
-        aborted
-        {
-            sh 'echo "THIS STEP WILL RUN WHEN JOB IS ABORTED"'
+            success{
+                sh 'scp ${WORKSPACE}/webapp/target/*.war ec2-user@172.31.33.156:/home/ec2-user/usr/shared/apache-tomcat-9.0.70/webapps/prodapp.war' 
+            }
+            failure{
+                mail bcc: '', body: '''build failed because tomcat server is not running''', cc: '', from: '', replyTo: '', subject: 'BUILD FAILURE', to: 'hemacnaik21@gmail.com'
+            }
+            always
+            {
+                sh '''echo "this block will always run"'''
+
+            }
+            aborted{
+                sh '''echo "this block will run @ abort"'''
+            }
         }
     }
-
-}
+    
