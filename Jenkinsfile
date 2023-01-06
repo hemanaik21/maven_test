@@ -33,7 +33,7 @@ pipeline{
             steps
             {
                 
-            git 'https://github.com/keshavr21/test_cases.git'
+            git 'https://github.com/hemanaik21/test_cases.git'
         
             sh 'java -jar ${WORKSPACE}/testing.jar'
         }
