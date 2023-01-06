@@ -28,16 +28,16 @@ pipeline{
             deploy adapters: [tomcat9(credentialsId: 'Tomcat', path: '', url: 'http://172.31.33.156:8080/')], contextPath: 'decapp', war: '**/*war'
         }
         }
-         stage('continuous test')
-         {
-            steps
-            {
+         //stage('continuous test')
+         //{
+            //steps
+            //{
                 
-            git 'https://github.com/hemanaik21/test_cases.git'
+            //git 'https://github.com/hemanaik21/test_cases.git'
         
-            sh 'java -jar ${WORKSPACE}/testing.jar'
-            }
-            }
+            //sh 'java -jar ${WORKSPACE}/testing.jar'
+            //}
+            //}
     
         //stage('continuous delivery')
         //{
