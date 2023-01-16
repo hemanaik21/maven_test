@@ -28,16 +28,16 @@ pipeline{
             deploy adapters: [tomcat9(credentialsId: 'Tomcat', path: '', url: 'http://172.31.33.156:8080/')], contextPath: 'decapp', war: '**/*war'
         }
         }
-         //stage('continuous test')
-         //{
-            //steps
-            //{
+         stage('continuous test')
+         {
+            steps
+            {
                 
-            //git 'https://github.com/hemanaik21/test_cases.git'
+            git 'https://github.com/hemanaik21/test_cases.git'
         
-            //sh 'java -jar ${WORKSPACE}/testing.jar'
-            //}
-            //}
+            sh 'java -jar ${WORKSPACE}/testing.jar'
+            }
+            }
     
         //stage('continuous delivery')
         //{
@@ -50,22 +50,22 @@ pipeline{
         //}
         //}
     }
-        //post
-        //{
-            //success{
-                //sh 'scp ${WORKSPACE}/webapp/target/*.war ec2-user@172.31.33.156:/home/ec2-user/usr/shared/apache-tomcat-9.0.70/webapps/prodapp.war' 
-            //}
-            //failure{
-                //mail bcc: '', body: '''build failed because tomcat server is not running''', cc: '', from: '', replyTo: '', subject: 'BUILD FAILURE', to: 'hemacnaik21@gmail.com'
-            //}
-            //always
-            //{
-                //sh '''echo "this block will always run"'''
+        post
+        {
+            success{
+                sh 'scp ${WORKSPACE}/webapp/target/*.war ec2-user@172.31.33.156:/home/ec2-user/usr/shared/apache-tomcat-9.0.70/webapps/prodapp.war' 
+            }
+            failure{
+                mail bcc: '', body: '''build failed because tomcat server is not running''', cc: '', from: '', replyTo: '', subject: 'BUILD FAILURE', to: 'hemacnaik21@gmail.com'
+            }
+            always
+            {
+                sh '''echo "this block will always run"'''
 
-            //}
-            //aborted{
-                //sh '''echo "this block will run @ abort"'''
-            //}
-        //}
+            }
+            aborted{
+                sh '''echo "this block will run @ abort"'''
+            }
+        }
     }
     
